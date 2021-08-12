@@ -1,0 +1,74 @@
+{
+  "name": "electron-react-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --config webpack.common.js --watch",
+    "start": "electron .",
+    "lint": "eslint *.js",
+    "lint --fix": "eslint --fix *.js"
+  },
+  "build": {
+    "appId": "com.electron.yourapp",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "assets",
+      "build/js",
+      "package.json",
+      "package-lock.json",
+      "index.html",
+      "main.js",
+      "preload.js"
+    ],
+    "mac": {
+      "icon": "assets/mac/icon_mac.icns",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "icon": "assets/win/icon_win.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@chakra-ui/react": "^1.6.4",
+    "@emotion/react": "^11.4.0",
+    "@emotion/styled": "^11.3.0",
+    "framer-motion": "^4.1.17",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^4.3.0",
+    "electron": "^10.4.7",
+    "electron-builder": "^22.11.7",
+    "electron-reload": "^1.5.0",
+    "eslint": "^7.29.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "sass": "^1.26.11",
+    "sass-loader": "^10.0.2",
+    "style-loader": "^1.2.1",
+    "webpack": "^5.40.0",
+    "webpack-cli": "^3.3.12"
+  }
+}
