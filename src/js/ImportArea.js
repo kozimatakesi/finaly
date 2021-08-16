@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Box, Button } from '@chakra-ui/react';
+import { DropArea } from './DropArea';
 
 const ImportArea = () => {
-  const a = 0;
+  const [filePath, setFilePath] = useState('');
+
+  const handleDrop = async (e) => {
+    const item = e.dataTransfer.items[0];
+    const entry = item.webkitGetAsEntry();
+    if (entry.isFile) {
+      setFilePath(e.dataTransfer.files[0].path);
+    }
+  };
+
   return (
     <Box>
-      <Input />
+      <DropArea onDrop={handleDrop}>
+        <Input
+          value={filePath}
+          readOnly
+        />
+      </DropArea>
       <Button>読み込み</Button>
     </Box>
   );
