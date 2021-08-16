@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, ChakraProvider, Container } from '@chakra-ui/react';
+import ImportArea from './ImportArea';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           Notify
 
         </Button>
+        <ImportArea />
       </Container>
     </ChakraProvider>
   );
