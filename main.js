@@ -10,8 +10,8 @@ const isDev = !app.isPackaged;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 600,
+    height: 400,
     backgroundColor: 'white',
     webPreferences: {
       nodeIntegration: false,
@@ -37,6 +37,7 @@ ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notifiation', body: message }).show();
 });
 
+// 特定のプロパティの値が入っているオブジェクトのindexを取得する関数
 function getIndex(value, arr, prop) {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i][prop] === value) {
@@ -55,10 +56,8 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
     const sheet1A1 = sheet1.A1.v;
     console.log(sheet1A1);
     const sheet1_json_all = xutil.sheet_to_json(sheet1);
-    const index = getIndex('駅名', sheet1_json_all, sheet1A1);
-    console.log(index);
-    console.log(sheet1_json_all[index]);
-    sheet1['!ref'] = 'A47:C100';
+    const serchStart = sheet1_json_all.filter((obj) => obj[sheet1A1] === 'ログ開始' || obj[sheet1A1] === 'ログ終了' || (/^\d{1,3}.+/).test(obj[sheet1A1]));
+    console.log(serchStart);
   })();
 });
 
