@@ -68,8 +68,15 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
     const sheet1A1 = sheet1.A1.v;
     console.log(sheet1A1);
     const sheet1_json_all = xutil.sheet_to_json(sheet1);
-    const serchStart = sheet1_json_all.filter((obj) => obj[sheet1A1] === 'ログ開始' || obj[sheet1A1] === 'ログ終了' || (/^\d{1,3}.+/).test(obj[sheet1A1]));
+    const serchStart = sheet1_json_all.filter((obj) => obj[sheet1A1] === 'ログ開始' || obj[sheet1A1] === 'ログ終了' || (/^\d{1,3}_.+/).test(obj[sheet1A1]));
+    console.log(serchStart);
     console.log(dateFromSn(serchStart[2].__EMPTY_1));
+    const excelInfo = [];
+    for (let i = 0; i <= serchStart.length - 3; i += 3) {
+      excelInfo.push({ name: serchStart[0 + i][sheet1A1], start: dateFromSn(serchStart[1 + i].__EMPTY_1), end: dateFromSn(serchStart[2 + i].__EMPTY_1) });
+    }
+    console.log(excelInfo);
+    e.reply('excelInfo', excelInfo);
   })();
 });
 
