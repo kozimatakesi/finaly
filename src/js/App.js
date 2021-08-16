@@ -13,7 +13,7 @@ export default function App() {
             electron.notificationApi.sendNotification('My custom notification!');
           }}
         >
-          Notify
+          Notifyaa
 
         </Button>
         <ImportArea />
