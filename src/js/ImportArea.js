@@ -21,7 +21,13 @@ const ImportArea = () => {
           readOnly
         />
       </DropArea>
-      <Button>読み込み</Button>
+      <Button onClick={() => {
+        api.filesApi.readExcelFile(filePath);
+      }}
+      >
+        読み込み
+
+      </Button>
     </Box>
   );
 };

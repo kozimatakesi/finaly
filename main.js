@@ -2,6 +2,9 @@ const {
   BrowserWindow, app, ipcMain, Notification,
 } = require('electron');
 const path = require('path');
+const xlsx = require('xlsx');
+
+const xutil = xlsx.utils;
 
 const isDev = !app.isPackaged;
 
@@ -29,8 +32,17 @@ if (isDev) {
   });
 }
 
+// お知らせの表示
 ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notifiation', body: message }).show();
+});
+
+// Excelファイルの取り込み
+ipcMain.on('readExcelFile', (e, dirPath) => {
+  const book = xlsx.readFile(dirPath);
+  const sheet1 = book.Sheets['日誌2021'];
+  const range = sheet1['!ref'];
+  console.log(range);
 });
 
 app.whenReady().then(createWindow);

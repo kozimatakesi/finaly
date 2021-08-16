@@ -1,6 +1,6 @@
 const { ipcRenderer, contextBridge } = require('electron');
 
-contextBridge.exposeInMainWorld('electron', {
+contextBridge.exposeInMainWorld('api', {
   notificationApi: {
     sendNotification(message) {
       ipcRenderer.send('notify', message);
@@ -10,6 +10,12 @@ contextBridge.exposeInMainWorld('electron', {
 
   },
   filesApi: {
+    readExcelFile(filePath) {
+      ipcRenderer.send('readExcelFile', filePath);
+    },
 
+  },
+  on: (channel, callback) => {
+    ipcRenderer.on(channel, (event, arg) => callback(event, arg));
   },
 });
