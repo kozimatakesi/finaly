@@ -37,12 +37,29 @@ ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notifiation', body: message }).show();
 });
 
+function getIndex(value, arr, prop) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i][prop] === value) {
+      return i;
+    }
+  }
+  return -1; // 値が存在しなかったとき
+}
+
 // Excelファイルの取り込み
 ipcMain.on('readExcelFile', (e, dirPath) => {
-  const book = xlsx.readFile(dirPath);
-  const sheet1 = book.Sheets['日誌2021'];
-  const range = sheet1['!ref'];
-  console.log(range);
+  (async () => {
+    const book = await xlsx.readFile(dirPath);
+    const sheet_name_list = book.SheetNames;
+    const sheet1 = book.Sheets[sheet_name_list[0]];
+    const sheet1A1 = sheet1.A1.v;
+    console.log(sheet1A1);
+    const sheet1_json_all = xutil.sheet_to_json(sheet1);
+    const index = getIndex('駅名', sheet1_json_all, sheet1A1);
+    console.log(index);
+    console.log(sheet1_json_all[index]);
+    sheet1['!ref'] = 'A47:C100';
+  })();
 });
 
 app.whenReady().then(createWindow);
