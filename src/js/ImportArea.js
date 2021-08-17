@@ -14,12 +14,36 @@ import { DropArea } from './DropArea';
 const ImportArea = () => {
   const [filePath, setFilePath] = useState('日誌EXCELファイルをここにドロップ');
   const [fileInfo, setFileInfo] = useState('');
+  const [scannerPath1, setScannerPath1] = useState('');
+  const [scannerPath2, setScannerPath2] = useState('');
+  const [uePath1, setUePath1] = useState('');
+  const [uePath2, setUePath2] = useState('');
+  const [uePath3, setUePath3] = useState('');
 
-  const handleDrop = async (e) => {
+  /*
+  if (fileInfo) {
+    fileInfo.scanner.forEach((_, index) => {
+      const valName = `scannerPath${index}`;
+      const functionName = `setScannerPath${index}`;
+      const [valName, functionName] = useState('');
+    });
+  }
+  */
+  // excelファイル用
+  const excelHandleDrop = async (e) => {
     const item = e.dataTransfer.items[0];
     const entry = item.webkitGetAsEntry();
     if (entry.isFile) {
       setFilePath(e.dataTransfer.files[0].path);
+    }
+  };
+
+  // scannerファイル用
+  const scannerHandleDrop1 = async (e) => {
+    const item = e.dataTransfer.items[0];
+    const entry = item.webkitGetAsEntry();
+    if (entry.isFile) {
+      setScannerPath1(e.dataTransfer.files[0].path);
     }
   };
 
@@ -32,7 +56,7 @@ const ImportArea = () => {
 
   return (
     <Box>
-      <DropArea onDrop={handleDrop}>
+      <DropArea onDrop={excelHandleDrop}>
         <Input
           value={filePath}
           readOnly
@@ -74,7 +98,11 @@ const ImportArea = () => {
                 fileInfo.scanner.map((data) => (
                   <Box key={data}>
                     {data}
-                    <Input />
+                    <DropArea onDrop={scannerHandleDrop1}>
+                      <Input
+                        value={scannerPath1}
+                      />
+                    </DropArea>
                   </Box>
                 ))
 
