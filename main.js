@@ -37,6 +37,10 @@ ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notifiation', body: message }).show();
 });
 
+ipcMain.on('readDirFile', (_, dirPath) => {
+  console.log(dirPath);
+});
+
 // Excelのシリアル値を変換するための変数及び関数
 const COEFFICIENT = 24 * 60 * 60 * 1000; // 日数とミリ秒を変換する係数
 const DATES_OFFSET = 70 * 365 + 17 + 1 + 1; // 「1900/1/0」～「1970/1/1」 (日数)

@@ -13,6 +13,9 @@ contextBridge.exposeInMainWorld('api', {
     readExcelFile(filePath) {
       ipcRenderer.send('readExcelFile', filePath);
     },
+    readDirFile(dirPath) {
+      ipcRenderer.send('readDirFile', dirPath);
+    },
 
   },
   on: (channel, callback) => {

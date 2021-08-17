@@ -4,12 +4,14 @@ import { DropArea } from './DropArea';
 
 const ScannerImportArea = ({ scannerName }) => {
   const [dirPath, setDirPath] = useState('');
+
   const HandleDrop = async (e) => {
     const item = e.dataTransfer.items[0];
     const entry = item.webkitGetAsEntry();
     if (entry.isDirectory) {
       setDirPath(e.dataTransfer.files[0].path);
     }
+    api.filesApi.readDirFile(e.dataTransfer.files[0].path);
   };
 
   return (

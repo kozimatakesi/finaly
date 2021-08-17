@@ -4,6 +4,7 @@ import { DropArea } from './DropArea';
 
 const UeImportArea = ({ ueData }) => {
   const [dirPath, setDirPath] = useState('');
+
   const HandleDrop = async (e) => {
     const item = e.dataTransfer.items[0];
     const entry = item.webkitGetAsEntry();
