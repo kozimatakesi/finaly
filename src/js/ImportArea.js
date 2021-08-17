@@ -26,6 +26,7 @@ const ImportArea = () => {
   useEffect(() => {
     api.on('excelInfo', (_, arg) => {
       setFileInfo(arg);
+      console.log(fileInfo);
     });
   }, []);
 
@@ -57,7 +58,7 @@ const ImportArea = () => {
           {
             fileInfo
               ? (
-                fileInfo.map((data) => (
+                fileInfo.timeInfo.map((data) => (
                   <Tr key={data.name}>
                     <Td>{data.name}</Td>
                     <Td>{data.start}</Td>
