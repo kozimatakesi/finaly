@@ -50,23 +50,23 @@ const ImportArea = () => {
             </Button>
           ) : <Text>日誌ファイルをドロップしてください</Text>
       }
-      <Text>
+      <Text mt={2}>
         ◯測定日 :
         {fileInfo ? fileInfo.date : ''}
       </Text>
-      <Text>
+      <Text mt={2}>
         ◯測定案件 :
         {fileInfo ? fileInfo.sb : ''}
       </Text>
-      <Text>
+      <Text mt={2}>
         ◯測定内容 :
         {fileInfo ? fileInfo.means : ''}
       </Text>
-      <Text>
+      <Text mt={2}>
         ◯測定エリア :
         {fileInfo ? fileInfo.area : ''}
       </Text>
-      <Text>◯Anritsu</Text>
+      <Text mt={2}>◯Anritsu</Text>
       <Box>
         {
             fileInfo
@@ -81,7 +81,7 @@ const ImportArea = () => {
               ) : ''
           }
       </Box>
-      <Text>◯測定端末</Text>
+      <Text mt={2}>◯測定端末</Text>
       <Box>
         {
             fileInfo
@@ -100,7 +100,7 @@ const ImportArea = () => {
               ) : ''
           }
       </Box>
-
+      <Text mt={2}>◯測定エリア毎ログ時間</Text>
       <Table size="sm">
         <TableCaption>取得リスト</TableCaption>
         <Thead>
