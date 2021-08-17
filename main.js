@@ -37,6 +37,9 @@ ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notifiation', body: message }).show();
 });
 
+// ドロップされたディレクトリのパスを管理するオブジェクト
+const pathInfo = {};
+
 // 各々のディレクトリがドロップされたときにオブジェクトpathInfoにパスを格納する
 ipcMain.on('readDirFile', (_, dirPath) => {
   console.log(dirPath);
@@ -52,8 +55,6 @@ const convertSn2Ut = (serialNumber) => (serialNumber - DATES_OFFSET) * COEFFICIE
 const dateFromSn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' });
 const dateOnlySn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleDateString('ja-JP');
 
-// ドロップされたディレクトリのパスを管理するオブジェクト
-const pathInfo = {};
 // Excelファイルの取り込み
 ipcMain.on('readExcelFile', (e, dirPath) => {
   const allExcelInfo = {};
@@ -68,8 +69,6 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
     const result = sheet1JsonAll.filter((obj) => obj[sheet1A1] === title);
     return result;
   };
-
-  // console.log(sheet1JsonAll);
 
   // 時間情報の取得
   const timeInfo = [];

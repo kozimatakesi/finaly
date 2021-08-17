@@ -15,15 +15,6 @@ import UeImportArea from './UeImportArea';
 const ImportArea = () => {
   const [filePath, setFilePath] = useState('日誌EXCELファイルをここにドロップ');
   const [fileInfo, setFileInfo] = useState('');
-  /*
-  if (fileInfo) {
-    fileInfo.scanner.forEach((_, index) => {
-      const valName = `scannerPath${index}`;
-      const functionName = `setScannerPath${index}`;
-      const [valName, functionName] = useState('');
-    });
-  }
-  */
   // excelファイル用
   const excelHandleDrop = async (e) => {
     const item = e.dataTransfer.items[0];
