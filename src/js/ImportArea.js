@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { DropArea } from './DropArea';
 import ScannerImportArea from './ScannerImportArea';
+import UeImportArea from './UeImportArea';
 
 const ImportArea = () => {
   const [filePath, setFilePath] = useState('日誌EXCELファイルをここにドロップ');
@@ -93,14 +94,7 @@ const ImportArea = () => {
             fileInfo
               ? (
                 fileInfo.ue.map((data) => (
-                  <Box key={data.number}>
-                    {data.carrer}
-                    _
-                    {data.test}
-                    _
-                    {data.bandLock}
-                    <Input />
-                  </Box>
+                  <UeImportArea ueData={data} key={data.number} />
                 ))
 
               ) : ''
