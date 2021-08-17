@@ -44,7 +44,7 @@ const ImportArea = () => {
         読み込み
 
       </Button>
-      <Table>
+      <Table size="sm">
         <TableCaption>取得リスト</TableCaption>
         <Thead>
           <Tr>

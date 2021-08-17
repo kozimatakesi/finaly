@@ -59,24 +59,69 @@ function dateFromSn(serialNumber) { // シリアル値→Date→hh:mm:ss表記
   return new Date(convertSn2Ut(serialNumber)).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' });
 }
 
+function dateOnlySn(serialNumber) {
+  return new Date(convertSn2Ut(serialNumber)).toLocaleDateString('ja-JP');
+}
+
 // Excelファイルの取り込み
 ipcMain.on('readExcelFile', (e, dirPath) => {
   (async () => {
     const book = await xlsx.readFile(dirPath);
-    const sheet_name_list = book.SheetNames;
-    const sheet1 = book.Sheets[sheet_name_list[0]];
+    const sheetNameList = book.SheetNames;
+    const sheet1 = book.Sheets[sheetNameList[0]];
     const sheet1A1 = sheet1.A1.v;
-    console.log(sheet1A1);
-    const sheet1_json_all = xutil.sheet_to_json(sheet1);
-    const serchStart = sheet1_json_all.filter((obj) => obj[sheet1A1] === 'ログ開始' || obj[sheet1A1] === 'ログ終了' || (/^\d{1,3}_.+/).test(obj[sheet1A1]));
-    console.log(serchStart);
-    console.log(dateFromSn(serchStart[2].__EMPTY_1));
-    const excelInfo = [];
+    const sheet1JsonAll = xutil.sheet_to_json(sheet1);
+    // console.log(sheet1JsonAll);
+    const serchStart = sheet1JsonAll.filter((obj) => obj[sheet1A1] === 'ログ開始' || obj[sheet1A1] === 'ログ終了' || (/^\d{1,3}_.+/).test(obj[sheet1A1]));
+    const timeInfo = [];
     for (let i = 0; i <= serchStart.length - 3; i += 3) {
-      excelInfo.push({ name: serchStart[0 + i][sheet1A1], start: dateFromSn(serchStart[1 + i].__EMPTY_1), end: dateFromSn(serchStart[2 + i].__EMPTY_1) });
+      timeInfo.push({
+        name: serchStart[0 + i][sheet1A1],
+        start: dateFromSn(serchStart[1 + i].__EMPTY_1),
+        end: dateFromSn(serchStart[2 + i].__EMPTY_1),
+      });
     }
-    console.log(excelInfo);
-    e.reply('excelInfo', excelInfo);
+    const UEInfo = [];
+
+    const careerInfo = sheet1JsonAll.filter((obj) => obj[sheet1A1] === 'キャリア');
+    const careerInfoArray = Object.values(careerInfo[0]);
+    const UESerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '端末');
+    const UESerchArray = Object.values(UESerch[0]);
+    const testInfo = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '試験内容');
+    const testInfoArray = Object.values(testInfo[0]);
+    const bandLockInfo = sheet1JsonAll.filter((obj) => obj[sheet1A1] === 'BAND');
+    const bandLockInfoArray = Object.values(bandLockInfo[0]);
+
+    for (let i = 1; i < UESerchArray.length; i++) {
+      if (UESerchArray[i] !== 0) {
+        UEInfo.push({
+          number: i,
+          carrer: careerInfoArray[i],
+          UE: UESerchArray[i],
+          test: testInfoArray[i],
+          bandLock: bandLockInfoArray[i] === '無し' ? 'Free' : bandLockInfoArray[i],
+        });
+      }
+    }
+
+    const scannerInfoSerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === 'スキャナ機種');
+    const scannerInfo = Object.values(scannerInfoSerch[0]);
+    scannerInfo.shift();
+
+    const areaInfoSerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '測定エリア');
+    const meansInfoSerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '測定内容');
+    const daysInfoSerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '測定日');
+
+    console.log(Object.values(areaInfoSerch[0])[1]);
+    console.log(Object.values(areaInfoSerch[1])[1]);
+    console.log(Object.values(meansInfoSerch[0])[1]);
+    console.log(dateOnlySn(Object.values(daysInfoSerch[0])[1]));
+
+    // console.log(UEInfo);
+    // console.log(scannerInfo);
+    // console.log(timeInfo);
+
+    e.reply('excelInfo', timeInfo);
   })();
 });
 
