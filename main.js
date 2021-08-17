@@ -37,21 +37,23 @@ ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notifiation', body: message }).show();
 });
 
+// 各々のディレクトリがドロップされたときにオブジェクトpathInfoにパスを格納する
 ipcMain.on('readDirFile', (_, dirPath) => {
   console.log(dirPath);
+  pathInfo[dirPath.index] = dirPath.path;
+  console.log(pathInfo);
 });
 
 // Excelのシリアル値を変換するための変数及び関数
 const COEFFICIENT = 24 * 60 * 60 * 1000; // 日数とミリ秒を変換する係数
 const DATES_OFFSET = 70 * 365 + 17 + 1 + 1; // 「1900/1/0」～「1970/1/1」 (日数)
 const MILLIS_DIFFERENCE = 9 * 60 * 60 * 1000; // UTCとJSTの時差 (ミリ秒)
-
-// シリアル値→UNIX時間(ミリ秒)
 const convertSn2Ut = (serialNumber) => (serialNumber - DATES_OFFSET) * COEFFICIENT - MILLIS_DIFFERENCE;
-// シリアル値→Date→hh:mm:ss表記
 const dateFromSn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' });
 const dateOnlySn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleDateString('ja-JP');
 
+// ドロップされたディレクトリのパスを管理するオブジェクト
+const pathInfo = {};
 // Excelファイルの取り込み
 ipcMain.on('readExcelFile', (e, dirPath) => {
   const allExcelInfo = {};
@@ -95,6 +97,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
         test: testInfo[i],
         bandLock: bandLockInfo[i] === '無し' ? 'Free' : `${bandLockInfo[i]}Lock`,
       });
+      pathInfo[`ue${i - 1}`] = '';
     }
   }
 
@@ -104,6 +107,9 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   const daysInfo = getLineDataTitle('測定日');
   const scannerInfo = Object.values(getLineDataTitle('スキャナ機種')[0]);
   scannerInfo.shift();
+  for (let i = 0; i < scannerInfo.length; i++) {
+    pathInfo[`scanner${i}`] = '';
+  }
 
   // それぞれの情報をオブジェクトallExcelInfoに格納
   allExcelInfo.sb = Object.values(areaInfo[0])[1];
@@ -114,7 +120,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   allExcelInfo.ue = UEInfo;
   allExcelInfo.time = timeInfo;
 
-  console.log(allExcelInfo);
+  console.log(pathInfo);
 
   e.reply('excelInfo', allExcelInfo);
 });

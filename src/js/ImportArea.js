@@ -81,8 +81,8 @@ const ImportArea = () => {
         {
             fileInfo
               ? (
-                fileInfo.scanner.map((data) => (
-                  <ScannerImportArea scannerName={data} key={data} />
+                fileInfo.scanner.map((data, index) => (
+                  <ScannerImportArea scannerName={data} key={data} number={index} />
                 ))
 
               ) : ''
@@ -93,8 +93,8 @@ const ImportArea = () => {
         {
             fileInfo
               ? (
-                fileInfo.ue.map((data) => (
-                  <UeImportArea ueData={data} key={data.number} />
+                fileInfo.ue.map((data, index) => (
+                  <UeImportArea ueData={data} key={data.number} number={index} />
                 ))
 
               ) : ''

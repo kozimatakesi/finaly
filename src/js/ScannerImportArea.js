@@ -2,7 +2,7 @@ import { Input, Box } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { DropArea } from './DropArea';
 
-const ScannerImportArea = ({ scannerName }) => {
+const ScannerImportArea = ({ scannerName, number }) => {
   const [dirPath, setDirPath] = useState('');
 
   const HandleDrop = async (e) => {
@@ -11,7 +11,7 @@ const ScannerImportArea = ({ scannerName }) => {
     if (entry.isDirectory) {
       setDirPath(e.dataTransfer.files[0].path);
     }
-    api.filesApi.readDirFile(e.dataTransfer.files[0].path);
+    api.filesApi.readDirFile({ index: `scanner${number}`, path: e.dataTransfer.files[0].path });
   };
 
   return (
