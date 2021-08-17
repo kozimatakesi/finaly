@@ -89,7 +89,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
         carrer: careerInfo[i],
         model: UESerch[i],
         test: testInfo[i],
-        bandLock: bandLockInfo[i] === '無し' ? 'Free' : bandLockInfo[i],
+        bandLock: bandLockInfo[i] === '無し' ? 'Free' : `${bandLockInfo[i]}Lock`,
       });
     }
   }

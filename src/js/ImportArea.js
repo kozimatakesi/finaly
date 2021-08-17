@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Input, Box, Button, Table,
+  Input, Box, Button, Table, Text,
   Thead,
   Tbody,
   Tfoot,
@@ -12,7 +12,7 @@ import {
 import { DropArea } from './DropArea';
 
 const ImportArea = () => {
-  const [filePath, setFilePath] = useState('');
+  const [filePath, setFilePath] = useState('日誌EXCELファイルをここにドロップ');
   const [fileInfo, setFileInfo] = useState('');
 
   const handleDrop = async (e) => {
@@ -38,13 +38,69 @@ const ImportArea = () => {
           readOnly
         />
       </DropArea>
-      <Button onClick={() => {
-        api.filesApi.readExcelFile(filePath);
-      }}
-      >
-        読み込み
 
-      </Button>
+      {
+        filePath !== '日誌EXCELファイルをここにドロップ'
+          ? (
+            <Button onClick={() => {
+              api.filesApi.readExcelFile(filePath);
+            }}
+            >
+              読み込み
+            </Button>
+          ) : <Text>日誌ファイルをドロップしてください</Text>
+      }
+      <Text>
+        ◯測定日 :
+        {fileInfo ? fileInfo.date : ''}
+      </Text>
+      <Text>
+        ◯測定案件 :
+        {fileInfo ? fileInfo.sb : ''}
+      </Text>
+      <Text>
+        ◯測定内容 :
+        {fileInfo ? fileInfo.means : ''}
+      </Text>
+      <Text>
+        ◯測定エリア :
+        {fileInfo ? fileInfo.area : ''}
+      </Text>
+      <Text>◯Anritsu</Text>
+      <Box>
+        {
+            fileInfo
+              ? (
+                fileInfo.scanner.map((data) => (
+                  <Box key={data}>
+                    {data}
+                    <Input />
+                  </Box>
+                ))
+
+              ) : ''
+          }
+      </Box>
+      <Text>◯測定端末</Text>
+      <Box>
+        {
+            fileInfo
+              ? (
+                fileInfo.ue.map((data) => (
+                  <Box key={data.number}>
+                    {data.carrer}
+                    _
+                    {data.test}
+                    _
+                    {data.bandLock}
+                    <Input />
+                  </Box>
+                ))
+
+              ) : ''
+          }
+      </Box>
+
       <Table size="sm">
         <TableCaption>取得リスト</TableCaption>
         <Thead>
