@@ -1,9 +1,8 @@
-import { Input } from '@chakra-ui/input';
-import { Box } from '@chakra-ui/layout';
+import { Input, Box } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { DropArea } from './DropArea';
 
-const DirImportArea = () => {
+const ScannerImportArea = ({ scannerName }) => {
   const [dirPath, setDirPath] = useState('');
   const HandleDrop = async (e) => {
     const item = e.dataTransfer.items[0];
@@ -16,12 +15,14 @@ const DirImportArea = () => {
   return (
     <Box>
       <DropArea onDrop={HandleDrop}>
+        {scannerName}
         <Input
           value={dirPath}
+          readOnly
         />
       </DropArea>
     </Box>
   );
 };
 
-export default DirImportArea;
+export default ScannerImportArea;

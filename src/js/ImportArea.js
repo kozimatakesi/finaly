@@ -3,23 +3,17 @@ import {
   Input, Box, Button, Table, Text,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
   TableCaption,
 } from '@chakra-ui/react';
 import { DropArea } from './DropArea';
+import ScannerImportArea from './ScannerImportArea';
 
 const ImportArea = () => {
   const [filePath, setFilePath] = useState('日誌EXCELファイルをここにドロップ');
   const [fileInfo, setFileInfo] = useState('');
-  const [scannerPath1, setScannerPath1] = useState('');
-  const [scannerPath2, setScannerPath2] = useState('');
-  const [uePath1, setUePath1] = useState('');
-  const [uePath2, setUePath2] = useState('');
-  const [uePath3, setUePath3] = useState('');
-
   /*
   if (fileInfo) {
     fileInfo.scanner.forEach((_, index) => {
@@ -35,15 +29,6 @@ const ImportArea = () => {
     const entry = item.webkitGetAsEntry();
     if (entry.isFile) {
       setFilePath(e.dataTransfer.files[0].path);
-    }
-  };
-
-  // scannerファイル用
-  const scannerHandleDrop1 = async (e) => {
-    const item = e.dataTransfer.items[0];
-    const entry = item.webkitGetAsEntry();
-    if (entry.isFile) {
-      setScannerPath1(e.dataTransfer.files[0].path);
     }
   };
 
@@ -96,14 +81,7 @@ const ImportArea = () => {
             fileInfo
               ? (
                 fileInfo.scanner.map((data) => (
-                  <Box key={data}>
-                    {data}
-                    <DropArea onDrop={scannerHandleDrop1}>
-                      <Input
-                        value={scannerPath1}
-                      />
-                    </DropArea>
-                  </Box>
+                  <ScannerImportArea scannerName={data} key={data} />
                 ))
 
               ) : ''
