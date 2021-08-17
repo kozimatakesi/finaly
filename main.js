@@ -66,6 +66,7 @@ function dateOnlySn(serialNumber) {
 // Excelファイルの取り込み
 ipcMain.on('readExcelFile', (e, dirPath) => {
   (async () => {
+    const allExcelInfo = {};
     const book = await xlsx.readFile(dirPath);
     const sheetNameList = book.SheetNames;
     const sheet1 = book.Sheets[sheetNameList[0]];
@@ -112,14 +113,15 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
     const meansInfoSerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '測定内容');
     const daysInfoSerch = sheet1JsonAll.filter((obj) => obj[sheet1A1] === '測定日');
 
-    console.log(Object.values(areaInfoSerch[0])[1]);
-    console.log(Object.values(areaInfoSerch[1])[1]);
-    console.log(Object.values(meansInfoSerch[0])[1]);
-    console.log(dateOnlySn(Object.values(daysInfoSerch[0])[1]));
+    allExcelInfo.SB = Object.values(areaInfoSerch[0])[1];
+    allExcelInfo.area = Object.values(areaInfoSerch[1])[1];
+    allExcelInfo.means = Object.values(meansInfoSerch[0])[1];
+    allExcelInfo.date = dateOnlySn(Object.values(daysInfoSerch[0])[1]);
+    allExcelInfo.scannerInfo = scannerInfo;
+    allExcelInfo.UEUnfo = UEInfo;
+    allExcelInfo.timeInfo = timeInfo;
 
-    // console.log(UEInfo);
-    // console.log(scannerInfo);
-    // console.log(timeInfo);
+    console.log(allExcelInfo);
 
     e.reply('excelInfo', timeInfo);
   })();
