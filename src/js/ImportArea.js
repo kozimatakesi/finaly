@@ -58,7 +58,7 @@ const ImportArea = () => {
           {
             fileInfo
               ? (
-                fileInfo.timeInfo.map((data) => (
+                fileInfo.time.map((data) => (
                   <Tr key={data.name}>
                     <Td>{data.name}</Td>
                     <Td>{data.start}</Td>
