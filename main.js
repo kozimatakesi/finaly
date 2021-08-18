@@ -2,6 +2,7 @@ const {
   BrowserWindow, app, ipcMain, Notification,
 } = require('electron');
 const path = require('path');
+const fs = require('fs').promises;
 const xlsx = require('xlsx');
 
 const xutil = xlsx.utils;
@@ -40,11 +41,19 @@ ipcMain.on('notify', (_, message) => {
 // ドロップされたディレクトリのパスを管理するオブジェクト
 const pathInfo = {};
 
+// 対象ディレクトリ直下のファイルを配列に入れ返す関数
+const getScannerList = async (dir) => {
+  const scanners = await fs.readdir(dir);
+  return scanners;
+};
+
 // 各々のディレクトリがドロップされたときにオブジェクトpathInfoにパスを格納する
 ipcMain.on('readDirFile', (_, dirPath) => {
-  console.log(dirPath);
-  pathInfo[dirPath.index] = dirPath.path;
-  console.log(pathInfo);
+  (async () => {
+    pathInfo[dirPath.index] = dirPath.path;
+    pathInfo[`${dirPath.index}Dir`] = await getScannerList(dirPath.path);
+    console.log(pathInfo);
+  })();
 });
 
 // Excelのシリアル値を変換するための変数及び関数
@@ -108,6 +117,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   scannerInfo.shift();
   for (let i = 0; i < scannerInfo.length; i++) {
     pathInfo[`scanner${i}`] = '';
+    pathInfo[`scanner${i}Dir`] = '';
   }
 
   // それぞれの情報をオブジェクトallExcelInfoに格納
