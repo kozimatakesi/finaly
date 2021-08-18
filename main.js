@@ -21,7 +21,7 @@ function createWindow() {
     },
   });
   // デベロッパーツールを表示させる、ビルド時は削除
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
   //
   win.loadFile('index.html');
 }
