@@ -40,6 +40,7 @@ ipcMain.on('notify', (_, message) => {
 
 // ドロップされたディレクトリのパスを管理するオブジェクト
 const pathInfo = {};
+const allExcelInfo = {};
 
 // 対象ディレクトリ直下のファイルを配列に入れ返す関数
 const getScannerList = async (dir) => {
@@ -64,9 +65,18 @@ const convertSn2Ut = (serialNumber) => (serialNumber - DATES_OFFSET) * COEFFICIE
 const dateFromSn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' });
 const dateOnlySn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleDateString('ja-JP');
 
+const changeDate = (date) => {
+  const dateArray = date.split('/');
+  for (let i = 1; i < 2; i++) {
+    if (dateArray[i].length === 1) {
+      dateArray[i] = `0${dateArray[i]}`;
+    }
+  }
+  return dateArray.join('');
+};
+
 // Excelファイルの取り込み
 ipcMain.on('readExcelFile', (e, dirPath) => {
-  const allExcelInfo = {};
   const book = xlsx.readFile(dirPath);
   const sheetNameList = book.SheetNames;
   const sheet1 = book.Sheets[sheetNameList[0]];
@@ -130,8 +140,21 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   allExcelInfo.time = timeInfo;
 
   console.log(pathInfo);
+  console.log(allExcelInfo);
 
   e.reply('excelInfo', allExcelInfo);
+});
+
+ipcMain.on('makeDir', (_, filePath) => {
+  (async () => {
+    const date = changeDate(allExcelInfo.date);
+    const sbname = allExcelInfo.sb.includes('SBM最適化_') ? allExcelInfo.sb.replace('M最適化_', '') : allExcelInfo.sb;
+    const makeDirPath = path.dirname(filePath);
+    fs.mkdir(`${makeDirPath}/${date}_${sbname}_${allExcelInfo.area}`, (err) => {
+      if (err) { throw err; }
+      console.log('testディレクトリが作成されました');
+    });
+  })();
 });
 
 app.whenReady().then(createWindow);

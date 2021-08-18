@@ -116,6 +116,13 @@ const ImportArea = () => {
           }
         </Tbody>
       </Table>
+      <Button onClick={() => {
+        api.filesApi.makeDir(filePath);
+      }}
+      >
+        フォルダ作成
+
+      </Button>
     </Box>
   );
 };
