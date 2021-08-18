@@ -4,6 +4,7 @@ const {
 const path = require('path');
 const fs = require('fs').promises;
 const xlsx = require('xlsx');
+const makeDir = require('make-dir');
 
 const xutil = xlsx.utils;
 
@@ -45,7 +46,8 @@ const allExcelInfo = {};
 // 対象ディレクトリ直下のファイルを配列に入れ返す関数
 const getScannerList = async (dir) => {
   const scanners = await fs.readdir(dir);
-  return scanners;
+  const result = scanners.filter((item) => item.match(/DS_Store/) == null);
+  return result;
 };
 
 // 各々のディレクトリがドロップされたときにオブジェクトpathInfoにパスを格納する
@@ -114,6 +116,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
         model: UESerch[i],
         test: testInfo[i],
         bandLock: bandLockInfo[i] === '無し' ? 'Free' : `${bandLockInfo[i]}Lock`,
+        dirName: `${careerInfo[i]}_${testInfo[i]}_${bandLockInfo[i] === '無し' ? 'Free' : `${bandLockInfo[i]}Lock`}`,
       });
       pathInfo[`ue${i - 1}`] = '';
     }
@@ -135,7 +138,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   allExcelInfo.area = Object.values(areaInfo[1])[1];
   allExcelInfo.means = Object.values(meansInfo[0])[1];
   allExcelInfo.date = dateOnlySn(Object.values(daysInfo[0])[1]);
-  allExcelInfo.scanner = scannerInfo;
+  allExcelInfo.scanner = scannerInfo.map((item) => item.replace('(M8780A)NEC', ''));
   allExcelInfo.ue = UEInfo;
   allExcelInfo.time = timeInfo;
 
@@ -150,10 +153,22 @@ ipcMain.on('makeDir', (_, filePath) => {
     const date = changeDate(allExcelInfo.date);
     const sbname = allExcelInfo.sb.includes('SBM最適化_') ? allExcelInfo.sb.replace('M最適化_', '') : allExcelInfo.sb;
     const makeDirPath = path.dirname(filePath);
-    fs.mkdir(`${makeDirPath}/${date}_${sbname}_${allExcelInfo.area}`, (err) => {
-      if (err) { throw err; }
-      console.log('testディレクトリが作成されました');
-    });
+    const makeDirPathRoot = `${makeDirPath}/${date}_${sbname}_${allExcelInfo.area}`;
+    const mainDir = await makeDir(makeDirPathRoot);
+    console.log(mainDir);
+    for (let i = 0; i < allExcelInfo.time.length; i++) {
+      const subDir = `${mainDir}/${allExcelInfo.time[i].name}`;
+      await makeDir(subDir);
+      for (let j = 0; j < allExcelInfo.ue.length; j++) {
+        await makeDir(`${subDir}/${allExcelInfo.ue[j].dirName}`);
+      }
+      for (let k = 0; k < allExcelInfo.scanner.length; k++) {
+        await makeDir(`${subDir}/${allExcelInfo.scanner[k]}`);
+        for (let l = 0; l < pathInfo[`scanner${k}Dir`].length; l++) {
+          await makeDir(`${subDir}/${allExcelInfo.scanner[k]}/${pathInfo[`scanner${k}Dir`][l]}`);
+        }
+      }
+    }
   })();
 });
 
