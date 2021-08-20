@@ -52,6 +52,15 @@ const getScannerList = async (dir) => {
   return result;
 };
 
+// 対象ファイルをどのディレクトリに入れるかの判定を行う関数
+const checkTime = (time) => {
+  for (let i = 0; i < allExcelInfo.time.length; i++) {
+    if (allExcelInfo.time[i].startMiri < time && time < allExcelInfo.time[i].endMiri) {
+      return allExcelInfo.time[i].name;
+    }
+  }
+};
+
 // 各々のディレクトリがドロップされたときにオブジェクトpathInfoにパスを格納する
 ipcMain.on('readDirFile', (_, dirPath) => {
   (async () => {
@@ -61,7 +70,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
       fileInfo[dirPath.path] = [];
       for (let i = 0; i < fileListName.length; i++) {
         const stats = await fs.stat(`${dirPath.path}/${fileListName[i]}`);
-        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime(), copyTo: `/${allExcelInfo.ue[dirPath.index.slice(-1)].dirName}` });
+        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime(), copyTo: `/${checkTime(stats.mtime.getTime())}/${allExcelInfo.ue[dirPath.index.slice(-1)].dirName}` });
       }
     } else {
       pathInfo[`${dirPath.index}Dir`] = [];
@@ -79,7 +88,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
         const scannerFileListName = await getScannerList(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}`);
         for (let j = 0; j < scannerFileListName.length; j++) {
           const scannerStat = await fs.stat(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}/${scannerFileListName[j]}`);
-          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime(), copyTo: `/${allExcelInfo.scanner[dirPath.index.slice(-1)]}/${fileListName[i]}` });
+          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime(), copyTo: `/${checkTime(scannerStat.mtime.getTime())}/${allExcelInfo.scanner[dirPath.index.slice(-1)]}/${fileListName[i]}` });
         }
       }
     }
@@ -210,6 +219,12 @@ ipcMain.on('makeDir', (_, filePath) => {
 
 // ファイル移動
 ipcMain.on('moveFile', () => {
+  const keyInfo = Object.keys(fileInfo);
+  for (let i = 0; i < keyInfo.length; i++) {
+    console.log(keyInfo[i]);
+    console.log(fileInfo[keyInfo[i]][0].copyTo);
+  }
+  /*
   (async () => {
     fs.copyFile('/Users/kawamoto/Desktop/a.txt', '/Users/kawamoto/Desktop/sampleDir/a.txt', (err) => {
       if (err) throw err;
@@ -217,6 +232,7 @@ ipcMain.on('moveFile', () => {
       console.log('ファイルを移動しました');
     });
   })();
+  */
 });
 
 app.whenReady().then(createWindow);
