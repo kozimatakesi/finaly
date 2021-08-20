@@ -61,7 +61,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
       fileInfo[dirPath.path] = [];
       for (let i = 0; i < fileListName.length; i++) {
         const stats = await fs.stat(`${dirPath.path}/${fileListName[i]}`);
-        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime() });
+        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime(), copyTo: `/${allExcelInfo.ue[dirPath.index.slice(-1)].dirName}` });
       }
     } else {
       pathInfo[`${dirPath.index}Dir`] = [];
@@ -79,7 +79,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
         const scannerFileListName = await getScannerList(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}`);
         for (let j = 0; j < scannerFileListName.length; j++) {
           const scannerStat = await fs.stat(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}/${scannerFileListName[j]}`);
-          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime() });
+          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime(), copyTo: `/${allExcelInfo.scanner[dirPath.index.slice(-1)]}/${fileListName[i]}` });
         }
       }
     }
