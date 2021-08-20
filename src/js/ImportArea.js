@@ -123,6 +123,14 @@ const ImportArea = () => {
         フォルダ作成
 
       </Button>
+      <Button onClick={() => {
+        api.filesApi.moveFile();
+      }}
+      >
+        ファイル移行
+
+      </Button>
+
     </Box>
   );
 };

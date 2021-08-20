@@ -43,6 +43,7 @@ ipcMain.on('notify', (_, message) => {
 const pathInfo = {};
 const allExcelInfo = {};
 const fileInfo = {};
+const newDir = {};
 
 // 対象ディレクトリ直下のファイルを配列に入れ返す関数
 const getScannerList = async (dir) => {
@@ -60,7 +61,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
     if (dirPath.index.includes('ue')) {
       for (let i = 0; i < fileListName.length; i++) {
         const stats = await fs.stat(`${dirPath.path}/${fileListName[i]}`);
-        pathInfo[`${dirPath.index}Dir`].push({ name: fileListName[i], time: stats.mtime.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' }) });
+        pathInfo[`${dirPath.index}Dir`].push({ name: fileListName[i], time: stats.mtime.getTime() });
       }
     } else {
       pathInfo[`${dirPath.index}Dir`] = fileListName;
@@ -77,7 +78,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
         const scannerFileListName = await getScannerList(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}`);
         for (let j = 0; j < scannerFileListName.length; j++) {
           const scannerStat = await fs.stat(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}/${scannerFileListName[j]}`);
-          fileInfo[`${path.basename(dirPath.path)}${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' }) });
+          fileInfo[`${path.basename(dirPath.path)}${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime() });
         }
       }
     }
@@ -92,6 +93,7 @@ const COEFFICIENT = 24 * 60 * 60 * 1000; // 日数とミリ秒を変換する係
 const DATES_OFFSET = 70 * 365 + 17 + 1 + 1; // 「1900/1/0」～「1970/1/1」 (日数)
 const MILLIS_DIFFERENCE = 9 * 60 * 60 * 1000; // UTCとJSTの時差 (ミリ秒)
 const convertSn2Ut = (serialNumber) => (serialNumber - DATES_OFFSET) * COEFFICIENT - MILLIS_DIFFERENCE;
+const dateMiri = (serialNumber) => new Date(convertSn2Ut(serialNumber));
 const dateFromSn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' });
 const dateOnlySn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleDateString('ja-JP');
 
@@ -127,6 +129,8 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
       name: serchStart[0 + i][sheet1A1],
       start: dateFromSn(serchStart[1 + i].__EMPTY_1),
       end: dateFromSn(serchStart[2 + i].__EMPTY_1),
+      startMiri: dateMiri(serchStart[1 + i].__EMPTY_1).getTime(),
+      endMiri: dateMiri(serchStart[2 + i].__EMPTY_1).getTime(),
     });
   }
 
@@ -188,6 +192,7 @@ ipcMain.on('makeDir', (_, filePath) => {
     for (let i = 0; i < allExcelInfo.time.length; i++) {
       const subDir = `${mainDir}/${allExcelInfo.time[i].name}`;
       await makeDir(subDir);
+      newDir[subDir] = { start: allExcelInfo.time[i].start, end: allExcelInfo.time[i].end };
       for (let j = 0; j < allExcelInfo.ue.length; j++) {
         await makeDir(`${subDir}/${allExcelInfo.ue[j].dirName}`);
       }
@@ -198,6 +203,18 @@ ipcMain.on('makeDir', (_, filePath) => {
         }
       }
     }
+    console.log(newDir);
+  })();
+});
+
+// ファイル移動
+ipcMain.on('moveFile', () => {
+  (async () => {
+    fs.copyFile('/Users/kawamoto/Desktop/a.txt', '/Users/kawamoto/Desktop/sampleDir/a.txt', (err) => {
+      if (err) throw err;
+
+      console.log('ファイルを移動しました');
+    });
   })();
 });
 
