@@ -12,8 +12,8 @@ const isDev = !app.isPackaged;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 500,
+    height: 800,
     backgroundColor: 'white',
     webPreferences: {
       nodeIntegration: false,
@@ -41,9 +41,10 @@ ipcMain.on('notify', (_, message) => {
 
 // ドロップされたディレクトリのパスを管理するオブジェクト
 const pathInfo = {};
+// ドロップされたエクセルの情報を管理するオブジェクト
 const allExcelInfo = {};
+// ドロップされたディレクトリ内のファイルを管理するオブジェクト
 const fileInfo = {};
-let newDir = '';
 
 // 対象ディレクトリ直下のファイルを配列に入れ返す関数
 const getScannerList = async (dir) => {
@@ -60,7 +61,8 @@ const checkTime = (time) => {
     }
   }
 };
-//　対象オブジェクトのプロパティが全て空でないかの判定を行う関数
+
+// 対象オブジェクトのプロパティが全て空でないかの判定を行う関数
 const checkObjEmpty = (obj) => {
   const keys = Object.keys(obj);
   for (let i = 0; i < keys.length; i++) {
@@ -108,7 +110,6 @@ ipcMain.on('readDirFile', (e, dirPath) => {
       e.reply('allPathInfo', checkObjEmpty(pathInfo));
     }
     console.log(fileInfo);
-    // console.log(Object.keys(fileInfo));
   })();
 });
 
@@ -121,6 +122,7 @@ const dateMiri = (serialNumber) => new Date(convertSn2Ut(serialNumber));
 const dateFromSn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' });
 const dateOnlySn = (serialNumber) => new Date(convertSn2Ut(serialNumber)).toLocaleDateString('ja-JP');
 
+// 日付をyyyy/mm/ddからyyyymmddに変換する関数
 const changeDate = (date) => {
   const dateArray = date.split('/');
   for (let i = 1; i < 2; i++) {
@@ -204,7 +206,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   e.reply('excelInfo', allExcelInfo);
 });
 
-// フォルダ作成
+// フォルダ作成、その後ファイル移動
 ipcMain.on('makeDir', (_, filePath) => {
   (async () => {
     const date = changeDate(allExcelInfo.date);
@@ -213,11 +215,9 @@ ipcMain.on('makeDir', (_, filePath) => {
     const makeDirPathRoot = `${makeDirPath}/${date}_${sbname}_${allExcelInfo.area}`;
     const mainDir = await makeDir(makeDirPathRoot);
     console.log(mainDir);
-    newDir = mainDir;
     for (let i = 0; i < allExcelInfo.time.length; i++) {
       const subDir = `${mainDir}/${allExcelInfo.time[i].name}`;
       await makeDir(subDir);
-      // newDir[subDir] = { start: allExcelInfo.time[i].start, end: allExcelInfo.time[i].end };
       for (let j = 0; j < allExcelInfo.ue.length; j++) {
         await makeDir(`${subDir}/${allExcelInfo.ue[j].dirName}`);
       }
@@ -234,33 +234,13 @@ ipcMain.on('makeDir', (_, filePath) => {
       for (let j = 0; j < fileInfo[keyInfo[i]].length; j++) {
         console.log(fileInfo[keyInfo[i]][j].name);
         const originalFilePath = `${keyInfo[i]}/${fileInfo[keyInfo[i]][j].name}`;
-        const copyToFilePath = `${newDir}${fileInfo[keyInfo[i]][j].copyTo}`;
+        const copyToFilePath = `${mainDir}${fileInfo[keyInfo[i]][j].copyTo}`;
         await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
           if (err) throw err;
-          console.log('ファイルを移動しました');
         });
       }
     }
-    new Notification({ title: 'Notifiation', body: `${newDir}を作成しました` }).show();
-  })();
-});
-
-// ファイル移動
-ipcMain.on('moveFile', () => {
-  (async () => {
-    const keyInfo = Object.keys(fileInfo);
-    for (let i = 0; i < keyInfo.length; i++) {
-      console.log(keyInfo[i]);
-      for (let j = 0; j < fileInfo[keyInfo[i]].length; j++) {
-        console.log(fileInfo[keyInfo[i]][j].name);
-        const originalFilePath = `${keyInfo[i]}/${fileInfo[keyInfo[i]][j].name}`;
-        const copyToFilePath = `${newDir}${fileInfo[keyInfo[i]][j].copyTo}`;
-        await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
-          if (err) throw err;
-          console.log('ファイルを移動しました');
-        });
-      }
-    }
+    new Notification({ title: '完了', body: `${mainDir}を作成しました` }).show();
   })();
 });
 

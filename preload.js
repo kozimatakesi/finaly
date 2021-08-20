@@ -19,9 +19,6 @@ contextBridge.exposeInMainWorld('api', {
     makeDir(filePath) {
       ipcRenderer.send('makeDir', filePath);
     },
-    moveFile() {
-      ipcRenderer.send('moveFile');
-    },
 
   },
   on: (channel, callback) => {

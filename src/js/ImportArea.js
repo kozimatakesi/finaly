@@ -6,7 +6,6 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
 } from '@chakra-ui/react';
 import { DropArea } from './DropArea';
 import ScannerImportArea from './ScannerImportArea';
@@ -99,7 +98,6 @@ const ImportArea = () => {
       </Box>
       <Text mt={2}>◯測定エリア毎ログ時間</Text>
       <Table size="sm">
-        <TableCaption>取得リスト</TableCaption>
         <Thead>
           <Tr>
             <Th>項目</Th>
@@ -133,7 +131,7 @@ const ImportArea = () => {
 
             </Button>
           )
-          : <Text>ダメ</Text>
+          : <Text />
       }
 
     </Box>
