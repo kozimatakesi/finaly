@@ -43,7 +43,7 @@ ipcMain.on('notify', (_, message) => {
 const pathInfo = {};
 const allExcelInfo = {};
 const fileInfo = {};
-const newDir = {};
+let newDir = '';
 
 // 対象ディレクトリ直下のファイルを配列に入れ返す関数
 const getScannerList = async (dir) => {
@@ -70,7 +70,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
       fileInfo[dirPath.path] = [];
       for (let i = 0; i < fileListName.length; i++) {
         const stats = await fs.stat(`${dirPath.path}/${fileListName[i]}`);
-        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime(), copyTo: `/${checkTime(stats.mtime.getTime())}/${allExcelInfo.ue[dirPath.index.slice(-1)].dirName}` });
+        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime(), copyTo: `/${checkTime(stats.mtime.getTime())}/${allExcelInfo.ue[dirPath.index.slice(-1)].dirName}/${fileListName[i]}` });
       }
     } else {
       pathInfo[`${dirPath.index}Dir`] = [];
@@ -88,7 +88,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
         const scannerFileListName = await getScannerList(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}`);
         for (let j = 0; j < scannerFileListName.length; j++) {
           const scannerStat = await fs.stat(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}/${scannerFileListName[j]}`);
-          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime(), copyTo: `/${checkTime(scannerStat.mtime.getTime())}/${allExcelInfo.scanner[dirPath.index.slice(-1)]}/${fileListName[i]}` });
+          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime(), copyTo: `/${checkTime(scannerStat.mtime.getTime())}/${allExcelInfo.scanner[dirPath.index.slice(-1)]}/${fileListName[i]}/${scannerFileListName[j]}` });
         }
       }
     }
@@ -199,10 +199,11 @@ ipcMain.on('makeDir', (_, filePath) => {
     const makeDirPathRoot = `${makeDirPath}/${date}_${sbname}_${allExcelInfo.area}`;
     const mainDir = await makeDir(makeDirPathRoot);
     console.log(mainDir);
+    newDir = mainDir;
     for (let i = 0; i < allExcelInfo.time.length; i++) {
       const subDir = `${mainDir}/${allExcelInfo.time[i].name}`;
       await makeDir(subDir);
-      newDir[subDir] = { start: allExcelInfo.time[i].start, end: allExcelInfo.time[i].end };
+      // newDir[subDir] = { start: allExcelInfo.time[i].start, end: allExcelInfo.time[i].end };
       for (let j = 0; j < allExcelInfo.ue.length; j++) {
         await makeDir(`${subDir}/${allExcelInfo.ue[j].dirName}`);
       }
@@ -213,17 +214,27 @@ ipcMain.on('makeDir', (_, filePath) => {
         }
       }
     }
-    console.log(newDir);
   })();
 });
 
 // ファイル移動
 ipcMain.on('moveFile', () => {
-  const keyInfo = Object.keys(fileInfo);
-  for (let i = 0; i < keyInfo.length; i++) {
-    console.log(keyInfo[i]);
-    console.log(fileInfo[keyInfo[i]][0].copyTo);
-  }
+  (async () => {
+    const keyInfo = Object.keys(fileInfo);
+    for (let i = 0; i < keyInfo.length; i++) {
+      console.log(keyInfo[i]);
+      for (let j = 0; j < fileInfo[keyInfo[i]].length; j++) {
+        console.log(fileInfo[keyInfo[i]][j].name);
+        const originalFilePath = `${keyInfo[i]}/${fileInfo[keyInfo[i]][j].name}`;
+        const copyToFilePath = `${newDir}${fileInfo[keyInfo[i]][j].copyTo}`;
+        await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
+          if (err) throw err;
+          console.log('ファイルを移動しました');
+        });
+      }
+    }
+  })();
+
   /*
   (async () => {
     fs.copyFile('/Users/kawamoto/Desktop/a.txt', '/Users/kawamoto/Desktop/sampleDir/a.txt', (err) => {
