@@ -60,9 +60,19 @@ const checkTime = (time) => {
     }
   }
 };
+//　対象オブジェクトのプロパティが全て空でないかの判定を行う関数
+const checkObjEmpty = (obj) => {
+  const keys = Object.keys(obj);
+  for (let i = 0; i < keys.length; i++) {
+    if (obj[keys[i]] === '') {
+      return;
+    }
+  }
+  return true;
+};
 
 // 各々のディレクトリがドロップされたときにオブジェクトpathInfoにパスを格納する
-ipcMain.on('readDirFile', (_, dirPath) => {
+ipcMain.on('readDirFile', (e, dirPath) => {
   (async () => {
     pathInfo[dirPath.index] = dirPath.path;
     const fileListName = await getScannerList(dirPath.path);
@@ -93,6 +103,10 @@ ipcMain.on('readDirFile', (_, dirPath) => {
       }
     }
     console.log(pathInfo);
+    console.log(checkObjEmpty(pathInfo));
+    if (checkObjEmpty(pathInfo)) {
+      e.reply('allPathInfo', checkObjEmpty(pathInfo));
+    }
     console.log(fileInfo);
     // console.log(Object.keys(fileInfo));
   })();
@@ -214,6 +228,20 @@ ipcMain.on('makeDir', (_, filePath) => {
         }
       }
     }
+    const keyInfo = Object.keys(fileInfo);
+    for (let i = 0; i < keyInfo.length; i++) {
+      console.log(keyInfo[i]);
+      for (let j = 0; j < fileInfo[keyInfo[i]].length; j++) {
+        console.log(fileInfo[keyInfo[i]][j].name);
+        const originalFilePath = `${keyInfo[i]}/${fileInfo[keyInfo[i]][j].name}`;
+        const copyToFilePath = `${newDir}${fileInfo[keyInfo[i]][j].copyTo}`;
+        await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
+          if (err) throw err;
+          console.log('ファイルを移動しました');
+        });
+      }
+    }
+    new Notification({ title: 'Notifiation', body: `${newDir}を作成しました` }).show();
   })();
 });
 
@@ -234,16 +262,6 @@ ipcMain.on('moveFile', () => {
       }
     }
   })();
-
-  /*
-  (async () => {
-    fs.copyFile('/Users/kawamoto/Desktop/a.txt', '/Users/kawamoto/Desktop/sampleDir/a.txt', (err) => {
-      if (err) throw err;
-
-      console.log('ファイルを移動しました');
-    });
-  })();
-  */
 });
 
 app.whenReady().then(createWindow);

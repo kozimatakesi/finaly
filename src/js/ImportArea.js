@@ -15,6 +15,8 @@ import UeImportArea from './UeImportArea';
 const ImportArea = () => {
   const [filePath, setFilePath] = useState('日誌EXCELファイルをここにドロップ');
   const [fileInfo, setFileInfo] = useState('');
+  const [allPathInfo, setAllPathInfo] = useState(false);
+
   // excelファイル用
   const excelHandleDrop = async (e) => {
     const item = e.dataTransfer.items[0];
@@ -28,6 +30,10 @@ const ImportArea = () => {
     api.on('excelInfo', (_, arg) => {
       setFileInfo(arg);
       console.log(fileInfo);
+    });
+
+    api.on('allPathInfo', (_, arg) => {
+      setAllPathInfo(arg);
     });
   }, []);
 
@@ -116,20 +122,19 @@ const ImportArea = () => {
           }
         </Tbody>
       </Table>
-      <Button onClick={() => {
-        api.filesApi.makeDir(filePath);
-      }}
-      >
-        フォルダ作成
+      {
+        allPathInfo
+          ? (
+            <Button onClick={() => {
+              api.filesApi.makeDir(filePath);
+            }}
+            >
+              フォルダ作成
 
-      </Button>
-      <Button onClick={() => {
-        api.filesApi.moveFile();
-      }}
-      >
-        ファイル移行
-
-      </Button>
+            </Button>
+          )
+          : <Text>ダメ</Text>
+      }
 
     </Box>
   );
