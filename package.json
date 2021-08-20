@@ -9,7 +9,9 @@
     "watch": "webpack --config webpack.common.js --watch",
     "start": "electron .",
     "lint": "eslint *.js",
-    "lint --fix": "eslint --fix *.js"
+    "lint --fix": "eslint --fix *.js",
+    "build:mac": "node_modules/.bin/electron-builder --mac --x64",
+    "build:windows": "node_modules/.bin/electron-builder --win --x64"
   },
   "build": {
     "appId": "com.electron.yourapp",
