@@ -56,18 +56,19 @@ const getScannerList = async (dir) => {
 ipcMain.on('readDirFile', (_, dirPath) => {
   (async () => {
     pathInfo[dirPath.index] = dirPath.path;
-    pathInfo[`${dirPath.index}Dir`] = [];
     const fileListName = await getScannerList(dirPath.path);
     if (dirPath.index.includes('ue')) {
+      fileInfo[dirPath.path] = [];
       for (let i = 0; i < fileListName.length; i++) {
         const stats = await fs.stat(`${dirPath.path}/${fileListName[i]}`);
-        pathInfo[`${dirPath.index}Dir`].push({ name: fileListName[i], time: stats.mtime.getTime() });
+        fileInfo[dirPath.path].push({ name: fileListName[i], time: stats.mtime.getTime() });
       }
     } else {
+      pathInfo[`${dirPath.index}Dir`] = [];
       pathInfo[`${dirPath.index}Dir`] = fileListName;
 
       for (let i = 0; i < fileListName.length; i++) {
-        fileInfo[path.basename(dirPath.path) + fileListName[i]] = [];
+        fileInfo[`${dirPath.path}/${fileListName[i]}`] = [];
         console.log(fileInfo);
       }
     }
@@ -78,7 +79,7 @@ ipcMain.on('readDirFile', (_, dirPath) => {
         const scannerFileListName = await getScannerList(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}`);
         for (let j = 0; j < scannerFileListName.length; j++) {
           const scannerStat = await fs.stat(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}/${scannerFileListName[j]}`);
-          fileInfo[`${path.basename(dirPath.path)}${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime() });
+          fileInfo[`${dirPath.path}/${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.getTime() });
         }
       }
     }
