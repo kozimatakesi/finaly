@@ -42,6 +42,7 @@ ipcMain.on('notify', (_, message) => {
 // ドロップされたディレクトリのパスを管理するオブジェクト
 const pathInfo = {};
 const allExcelInfo = {};
+const fileInfo = {};
 
 // 対象ディレクトリ直下のファイルを配列に入れ返す関数
 const getScannerList = async (dir) => {
@@ -59,13 +60,14 @@ ipcMain.on('readDirFile', (_, dirPath) => {
     if (dirPath.index.includes('ue')) {
       for (let i = 0; i < fileListName.length; i++) {
         const stats = await fs.stat(`${dirPath.path}/${fileListName[i]}`);
-        pathInfo[`${dirPath.index}Dir`].push({ name: fileListName[i], time: stats.mtime });
+        pathInfo[`${dirPath.index}Dir`].push({ name: fileListName[i], time: stats.mtime.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' }) });
       }
     } else {
       pathInfo[`${dirPath.index}Dir`] = fileListName;
 
       for (let i = 0; i < fileListName.length; i++) {
-        pathInfo[`${dirPath.index}Dir${i}Info`] = [];
+        fileInfo[path.basename(dirPath.path) + fileListName[i]] = [];
+        console.log(fileInfo);
       }
     }
 
@@ -75,11 +77,13 @@ ipcMain.on('readDirFile', (_, dirPath) => {
         const scannerFileListName = await getScannerList(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}`);
         for (let j = 0; j < scannerFileListName.length; j++) {
           const scannerStat = await fs.stat(`${dirPath.path}/${pathInfo[`${dirPath.index}Dir`][i]}/${scannerFileListName[j]}`);
-          pathInfo[`${dirPath.index}Dir${i}Info`].push({ name: scannerFileListName[j], time: scannerStat.mtime });
+          fileInfo[`${path.basename(dirPath.path)}${fileListName[i]}`].push({ name: scannerFileListName[j], time: scannerStat.mtime.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' }) });
         }
       }
     }
     console.log(pathInfo);
+    console.log(fileInfo);
+    // console.log(Object.keys(fileInfo));
   })();
 });
 
@@ -172,6 +176,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   e.reply('excelInfo', allExcelInfo);
 });
 
+// フォルダ作成
 ipcMain.on('makeDir', (_, filePath) => {
   (async () => {
     const date = changeDate(allExcelInfo.date);
