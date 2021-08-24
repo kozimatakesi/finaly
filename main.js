@@ -229,22 +229,31 @@ ipcMain.on('makeDir', (_, filePath) => {
       }
     }
     const keyInfo = Object.keys(fileInfo);
+    let notInTime = 0;
     for (let i = 0; i < keyInfo.length; i++) {
       // console.log(keyInfo[i]);
       for (let j = 0; j < fileInfo[keyInfo[i]].length; j++) {
         // console.log(fileInfo[keyInfo[i]][j].name);
         const originalFilePath = `${keyInfo[i]}/${fileInfo[keyInfo[i]][j].name}`;
         const copyToFilePath = `${mainDir}${fileInfo[keyInfo[i]][j].copyTo}`;
-        await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
-          if (err) new Notification({ title: 'エラー', body: `${err}` }).show();
-        });
+        if (!copyToFilePath.includes('undefined')) {
+          await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
+            if (err) new Notification({ title: 'エラー', body: `${err}` }).show();
+          });
+        } else {
+          notInTime++;
+        }
       }
-      await new Notification({ title: '完了', body: `${path.basename(keyInfo[i])}を移行しました` }).show();
+
+      new Notification({ title: '完了', body: `${path.basename(keyInfo[i])}を移行しました` }).show();
     }
-    new Notification({ title: '完了', body: `${mainDir}を作成しました` }).show();
+
+    new Notification({ title: '完了', body: `${mainDir}を作成しました ${notInTime}個のファイルは振り分けられませんでした` }).show();
+    /*
     pathInfo = {};
     allExcelInfo = {};
     fileInfo = {};
+    */
   })();
 });
 
