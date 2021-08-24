@@ -28,7 +28,7 @@ const ImportArea = () => {
   useEffect(() => {
     api.on('excelInfo', (_, arg) => {
       setFileInfo(arg);
-      console.log(fileInfo);
+      // console.log(fileInfo);
     });
 
     api.on('allPathInfo', (_, arg) => {
