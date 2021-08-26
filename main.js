@@ -90,7 +90,6 @@ ipcMain.on('readDirFile', (e, dirPath) => {
 
       for (let i = 0; i < fileListName.length; i++) {
         fileInfo[`${dirPath.path}/${fileListName[i]}`] = [];
-        // console.log(fileInfo);
       }
     }
 
@@ -104,12 +103,9 @@ ipcMain.on('readDirFile', (e, dirPath) => {
         }
       }
     }
-    // console.log(pathInfo);
-    // console.log(checkObjEmpty(pathInfo));
     if (checkObjEmpty(pathInfo)) {
       e.reply('allPathInfo', checkObjEmpty(pathInfo));
     }
-    // console.log(fileInfo);
   })();
 });
 
@@ -200,9 +196,6 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   allExcelInfo.ue = UEInfo;
   allExcelInfo.time = timeInfo;
 
-  // console.log(pathInfo);
-  // console.log(allExcelInfo);
-
   e.reply('excelInfo', allExcelInfo);
 });
 
@@ -214,7 +207,6 @@ ipcMain.on('makeDir', (_, filePath) => {
     const makeDirPath = path.dirname(filePath);
     const makeDirPathRoot = `${makeDirPath}/${date}_${sbname}_${allExcelInfo.area}`;
     const mainDir = await makeDir(makeDirPathRoot);
-    // console.log(mainDir);
     for (let i = 0; i < allExcelInfo.time.length; i++) {
       const subDir = `${mainDir}/${allExcelInfo.time[i].name}`;
       await makeDir(subDir);
@@ -231,13 +223,11 @@ ipcMain.on('makeDir', (_, filePath) => {
     const keyInfo = Object.keys(fileInfo);
     let notInTime = 0;
     for (let i = 0; i < keyInfo.length; i++) {
-      // console.log(keyInfo[i]);
       for (let j = 0; j < fileInfo[keyInfo[i]].length; j++) {
-        // console.log(fileInfo[keyInfo[i]][j].name);
         const originalFilePath = `${keyInfo[i]}/${fileInfo[keyInfo[i]][j].name}`;
         const copyToFilePath = `${mainDir}${fileInfo[keyInfo[i]][j].copyTo}`;
         if (!copyToFilePath.includes('undefined')) {
-          await fs.copyFile(originalFilePath, copyToFilePath, (err) => {
+          await fs.rename(originalFilePath, copyToFilePath, (err) => {
             if (err) new Notification({ title: 'エラー', body: `${err}` }).show();
           });
         } else {
@@ -245,15 +235,10 @@ ipcMain.on('makeDir', (_, filePath) => {
         }
       }
 
-      new Notification({ title: '完了', body: `${path.basename(keyInfo[i])}を移行しました` }).show();
+      new Notification({ title: '移行中', body: `${path.basename(keyInfo[i])}を移行しました` }).show();
     }
 
     new Notification({ title: '完了', body: `${mainDir}を作成しました ${notInTime}個のファイルは振り分けられませんでした` }).show();
-    /*
-    pathInfo = {};
-    allExcelInfo = {};
-    fileInfo = {};
-    */
   })();
 });
 
