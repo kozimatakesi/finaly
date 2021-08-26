@@ -151,8 +151,8 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
       name: serchStart[0 + i][sheet1A1],
       start: dateFromSn(serchStart[1 + i].__EMPTY_1),
       end: dateFromSn(serchStart[2 + i].__EMPTY_1),
-      startMiri: dateMiri(serchStart[1 + i].__EMPTY_1).getTime(),
-      endMiri: dateMiri(serchStart[2 + i].__EMPTY_1).getTime(),
+      startMiri: (dateMiri(serchStart[1 + i].__EMPTY_1).getTime()) - 30000,
+      endMiri: (dateMiri(serchStart[2 + i].__EMPTY_1).getTime()) + 30000,
     });
   }
 
@@ -195,7 +195,7 @@ ipcMain.on('readExcelFile', (e, dirPath) => {
   allExcelInfo.scanner = scannerInfo.map((item) => item.replace('(M8780A)NEC', ''));
   allExcelInfo.ue = UEInfo;
   allExcelInfo.time = timeInfo;
-
+  console.log(allExcelInfo);
   e.reply('excelInfo', allExcelInfo);
 });
 
